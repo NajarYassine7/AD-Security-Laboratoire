@@ -372,7 +372,7 @@ echo %USERDOMAIN%
 ENSA
 ```
 
-✅ WS01 est bien joint au domaine `ENSA.local`.
+ WS01 est bien joint au domaine `ENSA.local`.
 
 (SCREENSHOT NEEDED wa yassine WS01 montrant le domaine ENSA.local dans les informations système)
 
