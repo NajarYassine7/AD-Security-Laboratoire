@@ -59,6 +59,9 @@ Deux drapeaux ont été cachés pour valider chaque étape de l'attaque. Si post
 | `FLAG{kerber0astab0g}` | Champ Description du compte `svc.backup` dans ADUC | Énumération LDAP / Kerberoasting |
 | `FLAG{da_owned_abog}` | Bureau de l'Administrateur sur DC01 | Pass-the-Hash → Shell Domain Admin |
 
+<img width="621" height="669" alt="image" src="https://github.com/user-attachments/assets/6aaa932b-5e37-4141-9ddc-b7b583f30f7c" />
+<img width="955" height="908" alt="image" src="https://github.com/user-attachments/assets/9d6b37d8-a903-4641-a424-3abf812d78d2" />
+
 ---
 
 ### 1.4 Misconfigurations introduites
@@ -73,6 +76,9 @@ Ces erreurs de configuration simulent des erreurs humaines courantes dans les en
 | LDAP signing désactivé (GPO) | Énumération LDAP/BloodHound | 2.1 / 2.3 |
 | RC4 activé pour Kerberos (GPO) | Compatibilité outils d'attaque | 3.2 |
 | Aucun seuil de verrouillage de compte | Brute force sans risque | 3.1 |
+<img width="613" height="657" alt="image" src="https://github.com/user-attachments/assets/32c9daa1-99a3-4471-8f3b-171086e1fb98" />
+
+
 
 ---
 
@@ -209,6 +215,8 @@ ENSA.local
 ├── OU=Workstations (contient WS01)
 └── OU=Servers (contient DC01)
 ```
+<img width="237" height="596" alt="image" src="https://github.com/user-attachments/assets/1d88b7c4-e119-4cc2-ad7b-385d0c59da48" />
+
 
 (SCREENSHOTS ADUC montrant les OUs créées)
 
@@ -228,10 +236,12 @@ ENSA.local
 | Users (intégré) | `jane.admin` | Jane | Admin | `Pdcemulator123!` |
 | OU=ServiceAccounts | `svc.backup` | Backup | Service | `QuotasContainer123!` |
 | OU=ServiceAccounts | `svc.web` | Web | Service | `RIDMaster123!` |
+<img width="937" height="664" alt="image" src="https://github.com/user-attachments/assets/ac7332f6-b4d0-4c51-bd7c-b301faf18c00" />
 
-> **Note sur les mots de passe :** Windows Server 2025 impose des règles strictes sur la complexité des mots de passe. Les mots de passe choisis ont été basés sur des termes techniques familiers (`PDCEmulator`, `QuotasContainer`, `RIDMaster`) — une erreur humaine courante qui les rend vulnérables aux attaques par dictionnaire ciblé.
 
-(SCREENSHOT NEEDED ADUC montrant les utilisateurs créés dans leurs OUs)
+> **Note sur les mots de passe :** Windows Server 2025 impose des règles strictes sur la complexité des mots de passe. Les mots de passe choisis ont été basés sur des termes techniques familiers (`PDCEmulator`, `QuotasContainer`, `RIDMaster`)  une erreur humaine courante qui les rend vulnérables aux attaques par dictionnaire ciblé.
+
+
 
 ---
 
@@ -248,8 +258,9 @@ ADUC → Users → clic droit john.doe → Propriétés
 → Options de compte → cocher "Ne pas exiger la pré-authentification Kerberos"
 → Appliquer → OK
 ```
+<img width="613" height="657" alt="image" src="https://github.com/user-attachments/assets/f89dc754-3275-4b74-b31d-4129447e4ead" />
 
-(SCREENSHOT NEEDED  Propriétés de john.doe avec pré-auth désactivée)
+
 
 ---
 
@@ -269,8 +280,8 @@ ADUC → Users (conteneur intégré)
 → Taper: jane.admin → Vérifier les noms → OK
 → Appliquer → OK
 ```
+<img width="619" height="567" alt="image" src="https://github.com/user-attachments/assets/20a2ba21-2414-425e-8b86-89e39ce2c7e6" />
 
-(SCREENSHOT NEEDED wa yassine :Propriétés "Admins du domaine" montrant jane.admin comme membre)
 
 ---
 
@@ -316,7 +327,8 @@ ADUC → OU=ServiceAccounts → clic droit svc.backup → Propriétés
 → Appliquer → OK
 ```
 
-(SCREENSHOT NEEDED wa yassine Propriétés de svc.backup avec le flag dans Description)
+<img width="621" height="669" alt="image" src="https://github.com/user-attachments/assets/b54aab38-0891-4d44-b116-42bbc7591214" />
+
 
 **Flag 2 — `FLAG{da_owned_abog}` sur le bureau de DC01 :**
 
@@ -327,7 +339,8 @@ Clic droit sur le bureau de DC01 → Nouveau → Document texte
 → Enregistrer
 ```
 
-(SCREENSHOT NEEDED wa yassine flag.txt sur le bureau de DC01)
+<img width="955" height="908" alt="image" src="https://github.com/user-attachments/assets/f0a36a93-6efb-418e-9fb7-c8150ec1d660" />
+
 
 ---
 
@@ -350,7 +363,7 @@ La jonction au domaine repose entièrement sur la résolution DNS. Windows 11 do
 
 #### Jonction au domaine ENSA.local
 
->  **Important :** DC01 et WS01 doivent être démarrés **simultanément** pour que la jonction fonctionne. (my ram was killing me lol)
+>  **Important :** DC01 et WS01 doivent être démarrés **simultanément** pour que la jonction fonctionne. (My RAM was killing me lol)
 
 ```
 Paramètres → Système → Informations système
@@ -374,7 +387,7 @@ ENSA
 
  WS01 est bien joint au domaine `ENSA.local`.
 
-(SCREENSHOT NEEDED wa yassine WS01 montrant le domaine ENSA.local dans les informations système)
+
 
 ---
 
@@ -549,6 +562,8 @@ Domain password information:
   Minimum password length: 10
   Lockout threshold: None    ← Aucun verrouillage = brute force sans risque
 ```
+<img width="904" height="818" alt="image" src="https://github.com/user-attachments/assets/dc1a0a63-9cfc-45ae-b18a-be8494732040" />
+
 
 **Résultats critiques :**
 
@@ -562,8 +577,11 @@ Domain password information:
 | SMB signing | Requis | NTLM relay impossible |
 
 **Observation :** Windows Server 2025 bloque les liaisons LDAP anonymes par défaut, la commande nécessite des credentials valides (`john.doe`). Cependant, avec un simple compte utilisateur standard, l'intégralité de l'annuaire est accessible. Cela démontre qu'un insider avec les privilèges minimaux peut cartographier toute la surface d'attaque du domaine.
+DOMAINE INFORMATION:
+<img width="904" height="818" alt="image" src="https://github.com/user-attachments/assets/ec728b6e-5357-4fc6-b1db-a73063b629a2" />
+Le flag!
+<img width="705" height="894" alt="image" src="https://github.com/user-attachments/assets/31dcb062-3eb2-419d-8aca-8905d77ab4ea" />
 
-(SCREENSHOT NEEDED wa yassine Output complet de enum4linux-ng)
 
 ---
 
@@ -616,6 +634,7 @@ Host script results:
 MAC Address: 08:00:27:07:14:3D (Oracle VirtualBox virtual NIC)
 Service Info: Host: DC01; OS: Windows
 ```
+<img width="981" height="877" alt="image" src="https://github.com/user-attachments/assets/0df9c37f-4589-4d84-977d-34f7af2977e6" />
 
 **Ports critiques :**
 
@@ -633,8 +652,6 @@ Service Info: Host: DC01; OS: Windows
 - Clock skew de 3s → Kerberos fonctionnel (tolérance max: 5 minutes)
 - Hostname confirmé: `DC01.ENSA.local`
 
-(SCREENSHOT NEEDED : Output complet du scan nmap)
-
 ---
 
 ### 3.3 BloodHound : Cartographie des chemins d'attaque
@@ -645,6 +662,7 @@ BloodHound est un outil d'analyse de chemins d'attaque dans Active Directory. Il
 #### Installation
 
 **Installation de BloodHound :**
+<img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/74d89357-74f9-4433-90e8-86496364a697" />
 
 ```bash
 sudo apt install bloodhound -y
@@ -760,6 +778,8 @@ Se connecter à `http://localhost:8080` → glisser-déposer `bloodhound_data.zi
 | Find AS-REP Roastable Users | `john.doe@ENSA.LOCAL`  |
 | Find Kerberoastable Users | `svc.backup@ENSA.LOCAL`  |
 | Shortest Path to Domain Admins | `JANE.ADMIN → MemberOf → ADMINS DU DOMAINE` |
+<img width="957" height="936" alt="image" src="https://github.com/user-attachments/assets/ad68067f-76f8-4775-abef-db7afa4c756c" />
+
 
 **Graphe d'attaque BloodHound :**
 
@@ -773,11 +793,16 @@ DC01.ENSA.LOCAL
                                                               └─[WriteDacl]─► ADMINS DU DOMAINE
 ```
 
-(SCREENSHOT NEEDED Graphe BloodHound montrant le chemin vers Domain Admin)
+<img width="1600" height="335" alt="image" src="https://github.com/user-attachments/assets/90fa2d6e-104d-48a8-8338-602edc476395" />
 
-(SCREENSHOT NEEDED  Requête "Find AS-REP Roastable Users" montrant john.doe)
 
-(SCREENSHOT NEEDED  Requête "Find Kerberoastable Users" montrant svc.backup)
+Find AS-REP Roastable Users
+<img width="1011" height="179" alt="image" src="https://github.com/user-attachments/assets/53de0113-afee-4f65-8f08-75ed2210bf6b" />
+
+
+
+<img width="667" height="461" alt="image" src="https://github.com/user-attachments/assets/fb49bcc8-615e-4ceb-9e18-7e247425d025" />
+
 
 ---
 
@@ -887,11 +912,12 @@ john.doe : Password123
 
 > **Pourquoi c'est dangereux :** Hashcat a essayé des millions de mots de passe localement — le DC n'a jamais vu une seule tentative d'authentification. Aucun log de sécurité, aucune alerte. L'attaque est totalement invisible.
 
-(SCREENSHOT NEEDED: Output de hashcat montrant "Password123" cracké)
+<img width="1086" height="548" alt="image" src="https://github.com/user-attachments/assets/97a1f187-d6c0-4132-a592-46ff82240de5" />
+
 
 ---
 
-### 4.2 Kerberoasting (Step 3.2) — Non exécuté
+### 4.2 Kerberoasting (Step 3.2)
 
 **Théorie :**
 Le Kerberoasting consiste à demander un ticket TGS pour un compte ayant un SPN configuré. Ce ticket est chiffré avec le hash du mot de passe du compte de service. Avec `john.doe` authentifié, on cible `svc.backup` qui possède `MSSQLSvc/dc01.ENSA.local:1433`.
@@ -956,7 +982,8 @@ Info: Establishing connection to remote endpoint
 
 ** Shell PowerShell distant sur DC01 en tant que Domain Admin !**
 
-(SCREENSHOT NEEDED  Shell evil-winrm actif sur DC01)
+<img width="1085" height="294" alt="image" src="https://github.com/user-attachments/assets/fe1c58cd-3b98-47e8-af45-8a07dd7da99f" />
+
 
 ---
 
@@ -976,7 +1003,8 @@ FLAG{da_owned_abog}
 
 ** Domaine compromis : FLAG{da_owned_abog} capturé !**
 
-(SCREENSHOT NEEDED : type flag.txt dans le shell evil-winrm montrant FLAG{da_owned_abog})
+<img width="1071" height="435" alt="image" src="https://github.com/user-attachments/assets/7fd1f9f0-af46-445c-b37c-aa5f2cbcb1de" />
+
 
 ---
 
@@ -1033,6 +1061,8 @@ ADUC → Users → john.doe → Propriétés → Onglet Compte
 → Décocher "Ne pas exiger la pré-authentification Kerberos"
 → Appliquer → OK
 ```
+<img width="523" height="547" alt="image" src="https://github.com/user-attachments/assets/f1056d54-7361-4cd7-95ff-144d55d3954a" />
+
 
 #### Retirer jane.admin des Admins du domaine
 
@@ -1041,6 +1071,7 @@ ADUC → Users → Admins du domaine → Propriétés → Membres
 → Sélectionner jane.admin → Supprimer
 → Appliquer → OK
 ```
+<img width="1378" height="31" alt="image" src="https://github.com/user-attachments/assets/72f1cc34-75c1-4744-9ea6-6a33c38e1119" />
 
 #### Implémenter LAPS (Local Administrator Password Solution)
 
@@ -1055,6 +1086,10 @@ Group Policy Management → Default Domain Policy → Edit
 → Lockout threshold: 5 tentatives
 → Lockout duration: 30 minutes
 ```
+<img width="379" height="304" alt="image" src="https://github.com/user-attachments/assets/e5a139c2-b16e-4877-9b12-37574ff06ea5" />
+<img width="1600" height="65" alt="image" src="https://github.com/user-attachments/assets/6d734f63-7370-434e-8be8-e87035c5a9d4" />
+
+
 
 #### Imposer AES uniquement pour Kerberos
 
@@ -1064,6 +1099,8 @@ gpedit.msc → Computer Configuration → Windows Settings
 → "Network security: Configure encryption types allowed for Kerberos"
 → Décocher RC4_HMAC_MD5, garder seulement AES128 et AES256
 ```
+<img width="523" height="625" alt="image" src="https://github.com/user-attachments/assets/37b8bf98-101f-4e6a-98bb-64673b98b13e" />
+
 
 #### Réactiver le LDAP signing
 
@@ -1073,6 +1110,8 @@ gpedit.msc → Computer Configuration → Windows Settings
 → "Domain controller: LDAP server signing requirements"
 → Mettre à: Require signing
 ```
+<img width="1053" height="154" alt="image" src="https://github.com/user-attachments/assets/4877c4b4-ce5c-4944-9030-e7d1a32556a6" />
+
 
 ---
 
@@ -1093,7 +1132,6 @@ Relancer chaque attaque de la Phase 3 et confirmer qu'elles échouent.
 | Lecture du flag | `type C:\Users\Administrateur\Desktop\flag.txt.txt` | Accès refusé |
 | Énumération LDAP | `enum4linux-ng -A -u john.doe -p Password123 192.168.56.10` | Informations limitées / accès refusé |
 
-(SCREENSHOT NEEDED — Chaque attaque échouant post-durcissement)
 
 ---
 
