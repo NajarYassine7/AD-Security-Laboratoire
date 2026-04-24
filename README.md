@@ -59,8 +59,6 @@ Deux drapeaux ont été cachés pour valider chaque étape de l'attaque. Si post
 | `FLAG{kerber0astab0g}` | Champ Description du compte `svc.backup` dans ADUC | Énumération LDAP / Kerberoasting |
 | `FLAG{da_owned_abog}` | Bureau de l'Administrateur sur DC01 | Pass-the-Hash → Shell Domain Admin |
 
-<img width="621" height="669" alt="image" src="https://github.com/user-attachments/assets/6aaa932b-5e37-4141-9ddc-b7b583f30f7c" />
-<img width="955" height="908" alt="image" src="https://github.com/user-attachments/assets/9d6b37d8-a903-4641-a424-3abf812d78d2" />
 
 ---
 
